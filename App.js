@@ -1,31 +1,28 @@
 import React from 'react';
-import { StyleSheet, Text, KeyboardAvoidingView, TextInput, Platform } from 'react-native';
+import { StyleSheet, Text, KeyboardAvoidingView, Platform } from 'react-native';
 
-export default function App() {
-  return (
+import SearchInput from './components/SearchInput.js';
+export default class App extends React.Component {
+  render() {
 
-    <KeyboardAvoidingView style={styles.container}>
-      {/* Text label  */}
-      <Text style={[styles.largeText, styles.textStyle]}>Los Angeles</Text>
-      <Text style={[styles.smallText, styles.textStyle]}>Light Clouds</Text>
-      <Text style={[styles.largeText, styles.textStyle]}>24°</Text>
 
-      {/* TextInput field box
-        - "clearButtonMode" refers to a checkbox placed inside of textInput, that when the user clicks on it, it removes clears textfield. ONLY applies to IOS */}
-      <TextInput
-        autoCorrect={false}
-        placeholder="Search Any City.."
-        placeholderTextColor="white"
-        style={styles.textInput}
-        clearButtonMode="always"
-      />
+    return (
 
-      {/* End of View */}
-    </KeyboardAvoidingView>
-  );
+      <KeyboardAvoidingView style={styles.container}>
+        {/* Text label  */}
+        <Text style={[styles.largeText, styles.textStyle]}>Los Angeles</Text>
+        <Text style={[styles.smallText, styles.textStyle]}>Light Clouds</Text>
+        <Text style={[styles.largeText, styles.textStyle]}>24°</Text>
+
+
+        <SearchInput placeholder="Search Any City.." />
+        {/* End of View */}
+      </KeyboardAvoidingView>
+    );
+  }
 }
 
-// ################ Muh styles ################
+// ################ Styles ################
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -43,14 +40,5 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontFamily: Platform.OS === 'ios' ? 'AvenirNext-Regular' : 'Roboto',
   },
-  textInput: {
-    backgroundColor: '#666',
-    color: 'white',
-    height: 40,
-    width: 300,
-    marginTop: 20,
-    marginHorizontal: 20,
-    paddingHorizontal: 10,
-    alignSelf: 'center',
-  },
+
 });
