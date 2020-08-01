@@ -6,27 +6,54 @@ import React from 'react';
 import {StyleSheet, TextInput, View} from 'react-native';
 
 export default class SearchInput extends React.Component {
-  // * Property Initializer
-  handleChangeText = (newLocation) => {
-    // Do something with newLocation
+
+  /* Constructor is used to initialize the compoent-specific data aka state */
+    constructor(props) {
+      super(props);
+      this.state = {
+        text: '',
+      };
+    }
+
+  // .setState() is used to get value when new letters are typed into search box
+  handleChangeText = text => {
+    this.setState({ text});
   }
+
+  // User has submited or entered a new city
+  handleSubmitEditing = () => {
+    const { onSubmit } = this.props;
+    const { text } = this.state;
+
+    // If its not blank, then continue to onSubit()
+    if(!text) return;
+    // Capture text
+    onSubmit(text);
+    // Resets text value
+    this.setState({text: ''});
+  }
+
+  // Where the magic happens
   render() {
+    const { placeholder } = this.props;
+    const { text } = this.state;
+
     return (
       <View style={styles.container}>
 
         {/* TextInput field box
           - "clearButtonMode" refers to a checkbox placed inside of textInput, that when the user clicks on it, it removes clears textfield. ONLY applies to IOS
-          - 'this.props.placeholder' allows the placeholder to be determined by the parent App.js
-          - onChangeText is what happens when the textfield is changed*/}
+          */}
         <TextInput
           style={styles.textInput}
           autoCorrect={false}
-          placeholder={this.props.placeholder}
+          value={text}
+          placeholder={placeholder}
           placeholderTextColor="white"
           underlineColorAndroid="transparent"
           clearButtonMode="always"
           onChangeText={this.handleChangeText}
-        />
+          onSubmitEditing={this.handleSubmitEditing}/>
 
       </View>
     );
@@ -44,6 +71,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     borderRadius: 5,
   },
+  
   textInput: {
     flex: 1,
     color: 'white',
