@@ -1,3 +1,4 @@
+// Returns an array of locations based on search query
 export const fetchLocationId = async city => {
   const response = await fetch(
     `https://www.metaweather.com/api/location/search/?query=${city}`,
@@ -6,6 +7,7 @@ export const fetchLocationId = async city => {
   return locations[0].woeid;
 };
 
+// Returns weather details about a specific location using a location identifier known as WOEID (Where on earth ID)
 export const fetchWeather = async woeid => {
   const response = await fetch(
     `https://www.metaweather.com/api/location/${woeid}/`,

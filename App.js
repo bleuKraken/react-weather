@@ -1,6 +1,7 @@
 import React from 'react';
-import { StyleSheet, ImageBackground, Text, View, KeyboardAvoidingView, Platform } from 'react-native';
+import { StyleSheet, ImageBackground, Text, View, KeyboardAvoidingView, Platform, ActivityIndicator, StatusBar } from 'react-native';
 // Files to Import
+import { fetchLocationId, fetchWeather } from './utils/api';
 import getImageForWeather from './utils/getImageForWeather';
 import SearchInput from './components/SearchInput.js';
 
@@ -9,40 +10,82 @@ export default class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      location: 'Los Angeles',
+      loading: false,
+      error: false,
+      location: '',
+      temperature: 0,
+      weather: '',
     };
   }
 
+  // Predefined Lifecycle Method - runs after application loads successfully
+  // - gets triggered when application first loads and populates the city text aera
+  componentDidMount() {
+    this.handleUpdateLocation('Los Angeles');
+  }
+
   // WHen the user submits a new city, we change the state to the new city typed in
-  handleUpdateLocation = city => {
-    this.setState({
-      location: city,
+  handleUpdateLocation = async city => {
+    if (!city) return;
+
+    this.setState({ loading: true }, async () => {
+      try {
+        const locationId = await fetchLocationId(city);
+        const { location, weather, temperature } = await fetchWeather(
+          locationId,
+        );
+
+        this.setState({
+          loading: false,
+          error: false,
+          location,
+          weather,
+          temperature,
+        });
+      } catch (e) {
+        this.setState({
+          loading: false,
+          error: true,
+        });
+      }
     });
   };
 
   render() {
-    // Vars
-    const { location } = this.state;
-    // Return the magic
+    const { loading, error, location, weather, temperature } = this.state;
+
     return (
       <KeyboardAvoidingView style={styles.container}>
-
-        {/* Background Image */}
+        <StatusBar barStyle="light-content" />
         <ImageBackground
-          source={getImageForWeather('Clear')}
+          source={getImageForWeather(weather)}
           style={styles.imageContainer}
-          imageStyle={styles.image}>
-
-          {/* Container for Text */}
+          imageStyle={styles.image}
+        >
+          
           <View style={styles.detailsContainer}>
-            <Text style={[styles.largeText, styles.textStyle]}>{location}</Text>
-            <Text style={[styles.smallText, styles.textStyle]}>Light Clouds</Text>
-            <Text style={[styles.largeText, styles.textStyle]}>24°</Text>
+            <ActivityIndicator animating={loading} color="white" size="large" />
 
-            {/* Search Textbox Input  */}
-            <SearchInput
-             placeholder="Search Any City.."
-             onSubmit={this.handleUpdateLocation}/>
+            {!loading && (
+              <View>
+                {error && (
+                  <Text style={[styles.smallText, styles.textStyle]}>Could not load weather, please try a different city.</Text>
+                )}
+
+                {!error && (
+                  <View>
+                    <Text style={[styles.largeText, styles.textStyle]}> {location} </Text>
+                    <Text style={[styles.smallText, styles.textStyle]}> {weather} </Text>
+                    <Text style={[styles.largeText, styles.textStyle]}> {`${Math.round(temperature)}°`} </Text>
+                  </View>
+                )}
+
+                <SearchInput
+                  placeholder="Search any city"
+                  onSubmit={this.handleUpdateLocation}
+                />
+              </View>
+            )}
           </View>
         </ImageBackground>
       </KeyboardAvoidingView>
@@ -50,42 +93,36 @@ export default class App extends React.Component {
   }
 }
 
-// ################ Styles Below ################
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#34495E',
   },
-
   imageContainer: {
     flex: 1,
   },
-
   image: {
     flex: 1,
     width: null,
     height: null,
     resizeMode: 'cover',
   },
-
-  largeText: {
-    fontSize: 44,
-  },
-
-  smallText: {
-    fontSize: 18,
-  },
-
-  textStyle: {
-    textAlign: 'center',
-    fontFamily: Platform.OS === 'ios' ? 'AvenirNext-Regular' : 'Roboto',
-    color: 'white',
-  },
-  
   detailsContainer: {
     flex: 1,
     justifyContent: 'center',
     backgroundColor: 'rgba(0,0,0,0.2)',
     paddingHorizontal: 20,
+  },
+  textStyle: {
+    textAlign: 'center',
+    fontFamily: Platform.OS === 'ios' ? 'AvenirNext-Regular' : 'Roboto',
+    color: 'white',
+  },
+  largeText: {
+    fontSize: 44,
+  },
+  smallText: {
+    fontSize: 18,
   },
 });
