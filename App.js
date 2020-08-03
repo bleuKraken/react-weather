@@ -51,18 +51,20 @@ export default class App extends React.Component {
     });
   };
 
+  // Once we have all the data we need, begin to populate
   render() {
     const { loading, error, location, weather, temperature } = this.state;
 
     return (
       <KeyboardAvoidingView style={styles.container}>
         <StatusBar barStyle="light-content" />
+        {/* Background Image */}
         <ImageBackground
           source={getImageForWeather(weather)}
           style={styles.imageContainer}
           imageStyle={styles.image}
         >
-          
+
           <View style={styles.detailsContainer}>
             <ActivityIndicator animating={loading} color="white" size="large" />
 
